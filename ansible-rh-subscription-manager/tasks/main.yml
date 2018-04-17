@@ -1,0 +1,29 @@
+---
+# tasks file for ansible-rh-subscription-manager
+
+  - stat: path=/etc/pki/consumer/cert.pem
+    register: registered
+
+  - name: check RHS
+    command: "subscription-manager status"
+    register: rhs_status
+    ignore_errors: true
+
+  - name: Subscribe to RH
+    command: "{{ item }}"
+    when: rhs_status.stdout.find('Current') == -1
+    with_items:
+     - "subscription-manager register --force --user {{ rh_username }} --password {{ rh_password }}" 
+     - "subscription-manager attach --pool={{ rh_pool }}" 
+    no_log: true
+
+  - name: Set Repositories we need.
+    shell: |-
+       subscription-manager repos --disable '*'{{ ' ' }}
+       {%- for repo in rh_repos -%}
+         --enable {{ repo | quote }}{{ ' ' }}
+       {%-  endfor %}
+    retries: 3
+    delay: 3
+    register: result
+    until: result | success
