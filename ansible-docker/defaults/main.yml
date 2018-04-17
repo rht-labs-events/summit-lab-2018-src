@@ -1,0 +1,12 @@
+---
+# defaults file for docker
+docker_storage_disk: /dev/sdb
+docker_vg_name: docker_vg
+docker_lv1_name: usrdatadocker_lv
+docker_lv1_size: +50%FREE
+docker_lv2_name: varlibdocker_lv
+docker_lv2_size: +50%FREE
+docker_pool_size: +90%FREE
+docker_data: false
+docker_var: true
+docker_version: 1.12.6

@@ -1,0 +1,124 @@
+---
+# tasks file for docker
+
+- name: Check for Atomic Host
+  stat: path=/run/ostree-booted
+  register: atomic_host
+
+- name: install docker
+  yum:
+    name: docker-{{ docker_version }}
+    state: latest
+  when: atomic_host.stat.exists == False
+
+- name: check status of disk
+  stat:
+    path: "{{docker_storage_disk}}1"
+  register: disk_check_result
+  ignore_errors: True
+
+- name: create phyical volume from device
+  parted:
+    device: "{{ docker_storage_disk }}"
+    number: 1
+    state:  present
+    flags: [ lvm ]
+    part_end: 100%
+  when: disk_check_result.stat.exists == False
+
+- name: create VG
+  lvg:
+   vg: "{{docker_vg_name}}"
+   pvs: "{{docker_storage_disk}}1"
+  register: createdockervg
+
+- name: create LVOL /opt/docker/data
+  lvol:
+    vg: "{{docker_vg_name}}"
+    lv: "{{docker_lv1_name}}"
+    size: "{{docker_lv1_size}}"
+  when: 
+    - createdockervg.changed
+    - docker_data|bool == true
+
+- name: create fs
+  filesystem:
+    fstype: xfs
+    dev: /dev/mapper/{{docker_vg_name}}-{{docker_lv1_name}}
+  when: 
+    - createdockervg.changed
+    - docker_data|bool == true
+
+- name: create LVOL /var/lib/docker
+  lvol:
+   vg: "{{docker_vg_name}}"
+   lv: "{{docker_lv2_name}}"
+   size: "{{docker_lv2_size}}"
+  when:
+   - createdockervg.changed
+   - docker_var|bool == true
+  
+- name: create fs
+  filesystem:
+   fstype: xfs
+   dev: /dev/mapper/{{docker_vg_name}}-{{docker_lv2_name}}
+  when: 
+   - createdockervg.changed
+   - docker_var|bool == true
+
+- name: Stop Docker service
+  service:
+   state: stopped
+   name: docker 
+  when: 
+   - createdockervg.changed
+
+- name: Mount /opt/docker/data
+  mount:
+    name: /opt/docker/data
+    src: /dev/mapper/{{docker_vg_name}}-{{docker_lv1_name}}
+    fstype: xfs
+    state:  mounted
+  when: docker_data|bool == true
+
+
+- name: Mount /var/lib/docker
+  mount:
+   name: /var/lib/docker
+   src: /dev/mapper/{{docker_vg_name}}-{{docker_lv2_name}}
+   fstype: xfs
+   state: mounted
+  when: 
+   - createdockervg.changed
+   - docker_var|bool == true
+
+- name: Change docker-storage configuration
+  template:
+   src: "{{ role_path }}/files/docker-storage-setup.j2"
+   dest: /etc/sysconfig/docker-storage-setup
+   owner: root
+   group: root
+   mode: 0644
+  when: createdockervg.changed 
+
+- name: Automatically configure Docker storage
+  command: /usr/bin/docker-storage-setup
+  when: createdockervg.changed
+
+- name: Remove any usr data to clean disk
+  command: rm -rf /opt/docker/data/*
+  when: 
+    - createdockervg.changed
+    - docker_data|bool == true
+
+- name: Remove any Docker configuration to clean disk
+  command: rm -rf /var/lib/docker/*
+  when: 
+   - createdockervg.changed
+   - docker_var|bool == true
+
+- name: Start Docker service
+  service:
+    state: started
+    name: docker  
+  when: createdockervg.changed
