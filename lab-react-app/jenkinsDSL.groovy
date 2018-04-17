@@ -81,9 +81,9 @@ pipelineNames.each {
         steps {
             steps {
                 shell('#!/bin/bash' + newLine +
-                        'cd ./lab-app/ ' + newLine +
                         'NAME=' + appName  + newLine +
                         'set -o xtrace' + newLine +
+                        'cd ./lab-app/ ' + newLine +
                         'scl enable rh-nodejs6 \'npm install\'' + newLine +
                         'scl enable rh-nodejs6 \'npm run test:lint\'' + newLine +
                         'scl enable rh-nodejs6 \'npm run test-ci\'' + newLine +
@@ -97,7 +97,8 @@ pipelineNames.each {
             // nexus upload
             postBuildScripts {
                 steps {
-                    shell('curl -v -F r=releases \\' + newLine +
+                    shell('cd ./lab-app/ && \\' + newLine +
+                                ' curl -v -F r=releases \\' + newLine +
                                 '-F hasPom=false \\' + newLine +
                                 '-F e=zip \\' + newLine +
                                 '-F g=com.example.react \\' + newLine +
