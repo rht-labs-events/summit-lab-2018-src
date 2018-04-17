@@ -6,7 +6,7 @@ def pipelineNames = ["dev", "test", "uat"]
 def appName = "summit-labs-fe"
 
 //  Globals for across all the jobs
-def gitBaseUrlFE = "https://github.com/makentenza/draft-react-app-labs"
+def gitBaseUrlFE = "https://github.com/rht-labs-events/summit-lab-2018-src.git"
 def pipelineNamespace = "ci-cd"
 newLine = System.getProperty("line.separator")
 
@@ -82,6 +82,7 @@ pipelineNames.each {
         steps {
             steps {
                 shell('#!/bin/bash' + newLine +
+                        'cd ./lab-react-app/' + newLine +
                         'NAME=' + appName  + newLine +
                         'set -o xtrace' + newLine +
                         'scl enable rh-nodejs6 \'npm install\'' + newLine +
