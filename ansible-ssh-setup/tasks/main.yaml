@@ -1,0 +1,30 @@
+- name: Read my user SSH Key details
+  user:
+    name: "{{ ssh_user }}"
+    generate_ssh_key: yes
+    state: present
+  register: user
+
+- name: Add SSH User Key to all other servers
+  authorized_key:
+    user: "{{ item[0] }}"
+    key: "{{ user.ssh_public_key }}"
+  delegate_to: "{{ item[1] }}"
+  with_nested: 
+  - "{{ remote_ssh_user }}"
+  - "{{ groups['all'] }}"
+
+- name: Read network metadata from all servers
+  setup: 
+    gather_subset: network
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['all'] }}"
+  register: hostkeys
+
+- name: Populate known_hosts files on all servers
+  known_hosts:
+    path: /etc/ssh/ssh_known_hosts  
+    name: "{{ item.name }}"
+    key: "{{ item.name }},{{ item.ip}} ssh-rsa {{item.key}}"
+  with_items: "{{ hostkeys.results | json_query ('[].ansible_facts.{ name: ansible_fqdn, ip: ansible_default_ipv4.address, key:  ansible_ssh_host_key_rsa_public }') }}"
+

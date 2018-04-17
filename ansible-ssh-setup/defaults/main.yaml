@@ -1,0 +1,4 @@
+---
+ssh_user: 'root'
+remote_ssh_user: 'root'
+
