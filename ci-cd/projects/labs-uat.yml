@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: List
+items:
+- kind: ProjectRequest
+  apiVersion: v1
+  metadata:
+    name: labs-uat
+  displayName: Summit Labs User Acceptance Test Workspace

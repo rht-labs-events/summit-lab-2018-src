@@ -1,0 +1,55 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: companyxyz-fe-build
+  annotations:
+    openshift.io/display-name: S2I App Build Template
+    description: S2I binary build config to create an image with your app baked in.
+    iconClass: fa-cube
+    tags: s2i
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: "${NAME}"
+    name: "${NAME}"
+  spec:
+    completionDeadlineSeconds: 1200
+    nodeSelector:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}:{BUILD_TAG}"
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      binary: {}
+      type: Binary
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: "${NAME}"
+    name: "${NAME}"
+  spec: {}
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all objects and the resulting imagestream.
+  required: true
+  value: s2i-app
+- name: BUILD_TAG
+  displayName: Build Tag for Docker image
+  description: The tag to apply to the Docker image being built.
+  required: true
+  value: latest
+labels:
+  template: summit-labs-fe-build-template

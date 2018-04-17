@@ -1,0 +1,4 @@
+SOURCE_REPOSITORY_URL=https://github.com/makentenza/draft-labs.git
+NAME=jenkins
+SOURCE_CONTEXT_DIR=jenkins-s2i
+SOURCE_REPOSITORY_REF=master

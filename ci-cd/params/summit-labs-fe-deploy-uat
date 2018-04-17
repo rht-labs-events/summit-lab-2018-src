@@ -1,0 +1,5 @@
+PIPELINES_NAMESPACE=ci-cd
+NAME=summit-labs-fe
+DEPLOYER_USER=jenkins
+APP_TAG=latest
+NAMESPACE=labs-uat
