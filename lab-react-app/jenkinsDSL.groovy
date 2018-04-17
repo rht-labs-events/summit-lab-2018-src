@@ -98,7 +98,7 @@ pipelineNames.each {
             postBuildScripts {
                 steps {
                     shell('cd ./lab-app/ && \\' + newLine +
-                                ' curl -v -F r=releases \\' + newLine +
+                                'curl -v -F r=releases \\' + newLine +
                                 '-F hasPom=false \\' + newLine +
                                 '-F e=zip \\' + newLine +
                                 '-F g=com.example.react \\' + newLine +
