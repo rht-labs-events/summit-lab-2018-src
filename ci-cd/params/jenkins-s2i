@@ -1,4 +1,4 @@
-SOURCE_REPOSITORY_URL=https://github.com/makentenza/draft-labs.git
+SOURCE_REPOSITORY_URL=https://github.com/rht-labs-events/summit-lab-2018-src.git
 NAME=jenkins
-SOURCE_CONTEXT_DIR=jenkins-s2i
+SOURCE_CONTEXT_DIR=ci-cd/jenkins-s2i
 SOURCE_REPOSITORY_REF=master
