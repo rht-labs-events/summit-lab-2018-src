@@ -1,0 +1,56 @@
+---
+openshift_cluster_content:
+- object: projectrequest
+  content:
+  - name: "ci-cd-projects"
+    file: "{{ inventory_dir }}/../roles/ci-cd/projects/ci-cd.yml"
+    file_action: create
+  - name: "labs-dev"
+    file: "{{ inventory_dir }}/../roles/ci-cd/projects/labs-dev.yml"
+    file_action: create
+  - name: "labs-test"
+    file: "{{ inventory_dir }}/../roles/ci-cd/projects/labs-test.yml"
+    file_action: create
+  - name: "labs-uat"
+    file: "{{ inventory_dir }}/../roles/ci-cd/projects/labs-uat.yml"
+    file_action: create
+- object: ci-cd-builds
+  content:
+  - name: npm-jenkins-slave
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/jenkins-slave-pod.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/jenkins-slave-npm"
+    namespace: ci-cd
+  - name: jenkins
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/jenkins-s2i-build.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/jenkins-s2i"
+    namespace: ci-cd
+- object: deployments
+  content:
+  - name: "jenkins"
+    namespace: "ci-cd"
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/jenkins.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/jenkins"
+  - name: "nexus"
+    namespace: "ci-cd"
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/nexus.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/nexus"
+- object: app-builds
+  content:
+  - name: summit-labs-fe-build
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/summit-labs-fe-build.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/summit-labs-fe-build"
+    namespace: ci-cd
+- object: app-deployments
+  content:
+  - name:  summit-labs-fe
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/summit-labs-fe-deploy.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/summit-labs-fe-deploy-dev"
+    namespace: labs-dev
+  - name: summit-labs-fe
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/summit-labs-fe-deploy.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/summit-labs-fe-deploy-test"
+    namespace: labs-test
+  - name: summit-labs-fe
+    template: "{{ inventory_dir }}/../roles/ci-cd/templates/summit-labs-fe-deploy.yml"
+    params: "{{ inventory_dir }}/../roles/ci-cd/params/summit-labs-fe-deploy-uat"
+    namespace: labs-uat
