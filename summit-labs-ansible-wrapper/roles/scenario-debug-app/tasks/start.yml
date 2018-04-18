@@ -1,0 +1,13 @@
+---
+# tasks file for scenarion-debug-app
+
+- name: create new project hello-openshift
+  shell: "oc new-project hello-openshift"
+
+- name: copy example directory to the bastion server
+  copy:
+      src: hello-openshift
+      dest: "{{ item }}"
+  with_items:
+  - "/root/"
+  - "/home/lab-user/"

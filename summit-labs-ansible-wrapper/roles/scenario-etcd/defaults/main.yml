@@ -1,0 +1,14 @@
+---
+# defaults file for scenarion-etcd
+stop_etcd1: false
+stop_etcd2: false
+stop_etcd3: false
+
+start_etcd1: false
+start_etcd2: false
+start_etcd3: false
+
+solve_e2e: false
+
+start_time_drift: false
+solve_time_drift: false

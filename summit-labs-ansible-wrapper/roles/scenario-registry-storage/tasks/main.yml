@@ -1,0 +1,40 @@
+---
+# tasks file for  scenario-registry-storage 
+
+- name: Wait for Registru pod
+  oc_obj:
+    namespace: "{{ default_namespace }}"
+    kind: pod
+    state: list
+    selector: "deploymentconfig=docker-registry"
+  register: registry_pod
+  until:
+  - "registry_pod.results.results[0]['items'] | count > 0"
+  # Pod's 'Ready' status must be True
+  - "registry_pod.results.results[0]['items'] | lib_utils_oo_collect(attribute='status.conditions') | lib_utils_oo_collect(attribute='status', filters={'type': 'Ready'}) | map('bool') | select | list | count >= 1"
+  delay: 10
+
+- name: Set registry cli command
+  set_fact:
+   registry_cli_client: "oc rsh --namespace={{ default_namespace }} {{ registry_pod.results.results[0]['items'][0]['metadata']['name'] }}"
+
+- name: Create temp registry folder
+  command: "{{ registry_cli_client }} mkdir -p /registry/s2temp"
+
+- name: Create random files in the registry folder
+  run_once: true
+  command: "{{ registry_cli_client }} dd if=/dev/urandom of=/registry/s2temp/file_large{{ item }}.txt bs=1048576 count=1000"
+  register: output
+  with_sequence: count=30
+  ignore_errors: true 
+
+- name: Create random files in the registry folder
+  run_once: true
+  command: "{{ registry_cli_client }} dd if=/dev/urandom of=/registry/s2temp/file{{ item }}.txt bs=1048576 count=100"
+  register: output
+  with_sequence: count=10
+  ignore_errors: true 
+
+- name: generate build
+  run_once: true
+  command: "oc new-project build-test; oc new-app centos/ruby-22-centos7~https://github.com/openshift/ruby-ex.git"

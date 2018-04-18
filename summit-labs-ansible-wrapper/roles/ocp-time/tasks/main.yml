@@ -1,0 +1,6 @@
+---
+- name: force time sync
+  shell: "{{ item }}"
+  with_items:
+  - "chronyc -a 'burst 4/4'"
+  - "chronyc -a makestep"

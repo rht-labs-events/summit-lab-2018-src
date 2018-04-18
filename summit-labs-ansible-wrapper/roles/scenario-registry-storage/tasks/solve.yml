@@ -1,0 +1,27 @@
+---
+# tasks file for  scenario-registry-storage 
+
+- name: Wait for Registru pod
+  oc_obj:
+    namespace: "{{ default_namespace }}"
+    kind: pod
+    state: list
+    selector: "deploymentconfig=docker-registry"
+  register: registry_pod
+  until:
+  - "registry_pod.results.results[0]['items'] | count > 0"
+  # Pod's 'Ready' status must be True
+  - "registry_pod.results.results[0]['items'] | lib_utils_oo_collect(attribute='status.conditions') | lib_utils_oo_collect(attribute='status', filters={'type': 'Ready'}) | map('bool') | select | list | count >= 1"
+  delay: 10
+
+- name: Set registry cli command
+  set_fact:
+   registry_cli_client: "oc rsh --namespace={{ default_namespace }} {{ registry_pod.results.results[0]['items'][0]['metadata']['name'] }}"
+
+- name: Delete random files in the registry folder
+  run_once: true
+  command: "{{ registry_cli_client }} rm -rf /registry/s2temp"
+
+- name: delete project
+  run_once: True
+  command: "oc delete project build-test"

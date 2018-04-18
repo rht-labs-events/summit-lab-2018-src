@@ -1,0 +1,11 @@
+---
+- hosts: masters
+  roles:
+   - lib_openshift
+   - lib_utils
+  tasks:
+  #todo: move to import_role in 3.9
+  - name: Solve the scenario
+    include_role:
+      name: scenario-registry-storage
+      tasks_from: solve

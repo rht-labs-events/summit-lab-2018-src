@@ -1,0 +1,12 @@
+---
+ - hosts: masters[0]
+   roles:
+    #placeholder for api actions like rbac config, project creations
+    #- lib_openshift
+    #- ocp-registry
+    #- ocp-rbac
+
+ - hosts: masters
+   serial: 1
+   roles:
+    - ocp-post-hooks-masters

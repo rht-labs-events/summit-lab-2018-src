@@ -1,0 +1,178 @@
+---
+# tasks file for ocp-ravello
+
+- name: stop etcd1
+  systemd:
+    name: etcd_container
+    state: stopped
+  when: 
+   - ansible_hostname == 'master1'
+   - stop_etcd1
+
+- name: stop etcd2
+  systemd:
+    name: etcd_container
+    state: stopped
+  when: 
+   - ansible_hostname == 'master2'
+   - stop_etcd2
+
+- name: stop etcd3
+  systemd:
+    name: etcd_container
+    state: stopped
+  when: 
+   - ansible_hostname == 'master3'
+   - stop_etcd3
+
+- name: start etcd1
+  systemd:
+    name: etcd_container
+    state: started
+  when: 
+   - ansible_hostname == 'master1'
+   - start_etcd1
+
+- name: stop etcd2
+  systemd:
+    name: etcd_container
+    state: started
+  when: 
+   - ansible_hostname == 'master2'
+   - start_etcd2
+
+- name: stop etcd3
+  systemd:
+    name: etcd_container
+    state: started
+  when: 
+   - ansible_hostname == 'master3'
+   - start_etcd3 
+
+- block:
+  - name: dissable time drift
+    systemd:
+      name: chronyd
+      state: stopped
+
+  - name: drift master1
+    shell: "date -s @$(($(date +%s) + 100))"
+    when: ansible_hostname == 'master1'
+
+  - name: drift master2
+    shell: "date -s @$(($(date +%s) - 100))"
+    when: ansible_hostname == 'master2'
+
+  when: start_time_drift
+
+- block:
+  - name: dissable time drift
+    systemd:
+      name: chronyd
+      state: started
+  
+  - name: sync time
+    shell: "{{ item }}"
+    with_items:
+    - "chronyc -a 'burst 4/4'"
+    - "chronyc -a makestep"
+  when: solve_time_drift
+    
+- block: 
+  - name: force etcd1 to single node cluster
+    shell: "sed -i '/ExecStart=/s/$/  --force-new-cluster/' /etc/systemd/system/etcd_container.service"
+    when: ansible_hostname == 'master1'
+  
+  - name: reload etcd daemon and restart service
+    shell: "systemctl daemon-reload"
+    when: ansible_hostname == 'master1'
+
+  - name: reload etcd daemon and restart service
+    shell: "systemctl restart etcd_container"
+    when: ansible_hostname == 'master1'
+
+  - pause:
+      seconds: 20
+
+  - name: recover master1 to cluster mode
+    shell: "sed -i '/ExecStart/s/ --force-new-cluster//g' /etc/systemd/system/etcd_container.service"
+    when: ansible_hostname == 'master1'
+
+  - name: reload etcd daemon and restart service
+    shell: "systemctl daemon-reload"
+    when: ansible_hostname == 'master1'
+  
+  - name: reload etcd daemon and restart service
+    shell: "systemctl restart etcd_container"
+    when: ansible_hostname == 'master1'
+  
+  - pause:
+      seconds: 20
+  
+  - name: add master2 to master1
+    shell: |
+          docker exec -i etcd_container sh -c "ETCDCTL_API=3 etcdctl --cert=/etc/etcd/peer.crt --key=/etc/etcd/peer.key --cacert=/etc/etcd/ca.crt --endpoints='[https://192.168.0.11:2379,https://192.168.0.12:2379,https://192.168.0.13:2379]' member add master2.example.com --peer-urls='https://192.168.0.12:2380'"
+    when: ansible_hostname == 'master1'
+
+  - name: reload etcd daemon and restart service
+    shell: "systemctl stop etcd_container"
+    when: ansible_hostname == 'master2'    
+
+  - name: add member2 to the cluster
+    lineinfile:
+      path: /etc/etcd/etcd.conf
+      regexp: '^ETCD_INITIAL_CLUSTER='
+      line: 'ETCD_INITIAL_CLUSTER=master1.example.com=https://master1.example.com:2380,master2.example.com=https://master2.example.com:2380'
+    when: ansible_hostname == 'master2'
+
+  - name: add member2 to the cluster
+    lineinfile:
+      path: /etc/etcd/etcd.conf
+      regexp: '^ETCD_INITIAL_CLUSTER_STATE='
+      line: 'ETCD_INITIAL_CLUSTER_STATE=existing'
+    when: ansible_hostname == 'master2'
+
+  - name: clean members data
+    shell: "rm -rf /var/lib/etcd/member"
+    when: ansible_hostname == 'master2' 
+
+  - name: reload etcd daemon and restart service
+    shell: "systemctl start etcd_container"
+    when: ansible_hostname == 'master2'      
+
+  - pause:
+     seconds: 30    
+
+  - name: add master3 to master1
+    shell: |
+          docker exec -i etcd_container sh -c "ETCDCTL_API=3 etcdctl --cert=/etc/etcd/peer.crt --key=/etc/etcd/peer.key --cacert=/etc/etcd/ca.crt --endpoints="[https://192.168.0.11:2379,https://192.168.0.12:2379,https://192.168.0.13:2379]" member add master3.example.com --peer-urls="https://192.168.0.13:2380""
+    when: ansible_hostname == 'master1'
+
+  - name: reload etcd daemon and restart service
+    shell: "systemctl stop etcd_container"
+    when: ansible_hostname == 'master3'    
+
+  - name: add member3 to the cluster
+    lineinfile:
+      path: /etc/etcd/etcd.conf
+      regexp: '^ETCD_INITIAL_CLUSTER='
+      line: 'ETCD_INITIAL_CLUSTER=master2.example.com=https://master2.example.com:2380,master1.example.com=https://master1.example.com:2380,master3.example.com=https://master3.example.com:2380'
+    when: ansible_hostname == 'master3'
+
+  - name: add member3 to the cluster
+    lineinfile:
+      path: /etc/etcd/etcd.conf
+      regexp: '^ETCD_INITIAL_CLUSTER_STATE='
+      line: 'ETCD_INITIAL_CLUSTER_STATE=existing'
+    when: ansible_hostname == 'master3'
+
+  - name: clean members data
+    shell: "rm -rf /var/lib/etcd/member"
+    when: ansible_hostname == 'master3' 
+
+  - name: reload etcd daemon and restart service
+    shell: "systemctl start etcd_container"
+    when: ansible_hostname == 'master3'     
+
+  when: 
+  - solve_e2e

@@ -1,0 +1,202 @@
+---
+# tasks file for ocp-ravello
+
+- name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+  wait_for:
+    port: 22
+    host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+    search_regex: OpenSSH
+    delay: 10
+  vars:
+    ansible_connection: local
+
+#TODO: create haproxy container
+#TODO: add apps health check status (order start for gluster and other pre-deployed apps)
+
+- name: Get external bastion ip
+  uri:
+    url: http://www.opentlc.com/getip
+    return_content: yes
+  register: bastion_ip
+  when: "'bastion' in group_names"
+
+- name: Get bastion hostname
+  shell: hostname
+  register: bastion_hostname
+  when: "'bastion' in group_names"
+
+- set_fact:
+    master_hostname: "{% if 'repl' in bastion_hostname.stdout | lower %}console.{{ bastion_ip.content | replace('\n', '') | replace(' ', '') }}.xip.io{% else %}console-{{ bastion_hostname.stdout.split('-')[1].split('.')[0] | replace(' ', '') | lower }}.generic.opentlc.com{% endif %}"
+    apps_hostname: "{% if 'repl' in bastion_hostname.stdout | lower %}apps.{{ bastion_ip.content | replace('\n', '') | replace(' ', '') }}.xip.io{% else %}apps-{{ bastion_hostname.stdout.split('-')[1].split('.')[0] | replace(' ', '') | lower }}.generic.opentlc.com{% endif %}"
+  when: "'bastion' in group_names"
+    
+- debug:
+    msg: 
+      - "Master hostname: {{ master_hostname }}"
+      -  "Apps Hostname: {{ apps_hostname }}"
+  when: "'bastion' in group_names"
+
+- name: Template haproxy with new config
+  template:
+    src: "{{ item }}"
+    dest: /etc/haproxy/{{ item | basename | regex_replace('\.j2','') }}
+  with_items:
+    - haproxy.cfg.j2
+  when: "'bastion' in group_names"
+  
+- name: copy script and systemd to the bastion host
+  copy:
+    src: "{{ item.file }}"
+    dest: "{{ item.destination }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - file: script.sh
+      destination: /usr/local/bin/startlab.sh
+      mode: u=rwx,g=xr,o=r
+    - file: start-lab.service
+      destination: /etc/systemd/system/start-lab.service
+      mode: u=rw,g=r,o=r
+  when: "'bastion' in group_names"
+
+- name: just force systemd to reread configs (2.4 and above)
+  systemd: daemon_reload=yes
+  when: "'bastion' in group_names"
+
+- name: enable service start-lab
+  systemd:
+    name: start-lab
+    enabled: yes
+  when: "'bastion' in group_names"
+
+- name: restart haproxy service 
+  systemd:
+    name: haproxy
+    state: restarted
+  when: "'bastion' in group_names"
+  
+### configure masters to point to new names
+
+- set_fact:
+    apps_hostname: "{{ hostvars['bastion.example.com']['apps_hostname'] }}"
+    master_hostname: "{{ hostvars['bastion.example.com']['master_hostname'] }}"
+
+## TODO: remove bastion.example.com ang get name dynamicaly or set facts globaly
+- name: replace master config values
+  replace:
+    path: /etc/origin/master/master-config.yaml
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+    backup: yes
+  with_items:
+    - regexp: 'masterPublicURL: .*$'
+      replace: 'masterPublicURL: https://{{ master_hostname }}'
+    - regexp: 'assetPublicURL: .*$'
+      replace: 'assetPublicURL: https://{{ master_hostname }}/console/'
+    - regexp: 'publicURL: .*$'
+      replace: 'publicURL: https://{{ master_hostname }}/console/'
+    - regexp: 'subdomain: .*$'
+      replace: 'subdomain: {{ apps_hostname }}'
+  when: "'masters' in group_names"
+
+- include_role:
+    name: openshift_web_console
+    tasks_from: update_console_config.yml
+  vars:
+    console_config_edits:
+    - key: clusterInfo#consolePublicURL
+      value: "https://{{ master_hostname }}/console/"
+    - key: clusterInfo#masterPublicURL
+      value: "https://{{ master_hostname }}"
+  when: "'masters' in group_names"
+
+- name: restart master process 
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - atomic-openshift-master-controllers 
+    - atomic-openshift-master-api
+  when: "'masters' in group_names"
+
+#### Configure pre-deployed apps to have new routes
+- pause:
+    seconds: 20
+
+- name: create prometheus and alerts routes
+  run_once: true
+  oc_route:
+    state: present
+    name: "{{ item.name }}2"
+    host: "{{ item.host }}"
+    namespace: "openshift-metrics"
+    service_name: "{{ item.name }}"
+    #tls_termination: reencrypt
+    tls_termination: edge
+  with_items:
+  - name: prometheus
+    host: "prometheus.{{ hostvars['bastion.example.com']['apps_hostname'] }}"
+  - name: alerts
+    host: "alerts.{{ hostvars['bastion.example.com']['apps_hostname'] }}"
+  - name: alertmanager
+    host: "alertmanager.{{ hostvars['bastion.example.com']['apps_hostname'] }}"
+  when: "'masters' in group_names"
+
+- name: create grafana and alerts routes
+  run_once: true
+  oc_route:
+    state: present
+    name: "{{ item.name }}2"
+    host: "{{ item.host }}"
+    namespace: "openshift-grafana"
+    service_name: "{{ item.name }}"
+    #tls_termination: reencrypt
+    tls_termination: edge
+  with_items:
+  - name: grafana
+    host: "grafana.{{ hostvars['bastion.example.com']['apps_hostname'] }}"
+  when: "'masters' in group_names"
+
+#status page
+- set_fact:
+    app_list: "[ 'https://prometheus.{{ hostvars['bastion.example.com']['apps_hostname'] }}', 'https://grafana.{{ hostvars['bastion.example.com']['apps_hostname'] }}', 'https://alertmanager.{{ hostvars['bastion.example.com']['apps_hostname'] }}' ]"
+
+- name: update motd2
+  template:
+    src: "{{ item }}"
+    dest: /etc/{{ item | basename | regex_replace('\.j2','') }}
+  vars:
+    guid: "{{ bastion_hostname.stdout.split('-')[1].split('.')[0] | lower}}"
+    proxy_hostname: "{{ bastion_hostname.stdout }}"
+    app_list: "{{ app_list }}"
+  with_items:
+    - motd.j2
+  when: "'bastion' in group_names"
+
+- name: scale up glusterfs
+  run_once: true
+  shell: oc label nodes infra1.example.com infra2.example.com infra3.example.com glusterfs=storage-host --overwrite
+
+- name: Wait for GlusterFS pods
+  oc_obj:
+    namespace: "glusterfs"  
+    kind: pod
+    state: list
+    selector: "glusterfs=storage-pod"
+  register: glusterfs_pods
+  until:
+  - "glusterfs_pods.results.results[0]['items'] | count > 0"
+  # There must be as many pods with 'Ready' staus  True as there are nodes expecting those pods
+  - "glusterfs_pods.results.results[0]['items'] | lib_utils_oo_collect(attribute='status.conditions') | lib_utils_oo_collect(attribute='status', filters={'type': 'Ready'}) | map('bool') | select | list | count == 3"
+  delay: 10
+  retries: "{{ (300 | int / 10) | int }}"
+  when: "'masters' in group_names"
+
+- name: scale dc to 1
+  run_once: true
+  shell: oc scale statefulset prometheus --replicas=1 -n openshift-metrics
+  when: "'masters' in group_names"
+
+- name: scale dc to 1
+  run_once: true
+  shell: oc scale deployment grafana --replicas=1 -n openshift-grafana
+  when: "'masters' in group_names"

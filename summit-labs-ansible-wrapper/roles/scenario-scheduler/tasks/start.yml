@@ -1,0 +1,25 @@
+---
+# tasks file for scenarion-scheduler
+
+- name: relabel nodes with wrong labels
+  run_once: true
+  shell: oc label nodes node1.example.com node2.example.com node3.example.com zone=az1 --overwrite
+
+- name: relabel nodes with wrong labels
+  run_once: true
+  shell: "{{ item }}"
+  with_items:
+  - "oc label nodes node1.example.com region=r1 --overwrite"
+  - "oc label nodes node2.example.com region=r2 --overwrite"
+  - "oc label nodes node3.example.com region=r3 --overwrite"
+  - "oc label node infra1.example.com zone=az1-infra --overwrite"
+  - "oc label node infra2.example.com zone=az2-infra --overwrite"
+  - "oc label node infra3.example.com zone=az3-infra --overwrite"
+
+- name: create scheduler project
+  run_once: true
+  shell: oc adm new-project scheduler --node-selector="zone=az1"
+
+- name: create demo pod in the project
+  run_once: true
+  shell: oc new-app openshift/hello-openshift -n scheduler

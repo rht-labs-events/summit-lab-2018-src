@@ -1,0 +1,6 @@
+---
+
+- name: Configure invetory groups
+  hosts: all
+  
+- include: ../roles/lab-src/openshift-ansible/playbooks/adhoc/uninstall.yml

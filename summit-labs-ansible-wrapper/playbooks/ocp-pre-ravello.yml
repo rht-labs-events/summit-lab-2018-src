@@ -1,0 +1,15 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: Wait 600 seconds, but only start checking after 30 seconds
+    wait_for_connection:
+      delay: 60
+      timeout: 600
+
+
+- hosts: all:!localhost
+  roles:
+   - lib_openshift
+   - lib_utils
+   - ocp-ravello

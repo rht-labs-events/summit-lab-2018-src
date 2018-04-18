@@ -1,0 +1,9 @@
+[Unit]
+
+[Service]
+ExecStart=/usr/local/bin/startlab.sh
+Environment=ANSIBLE_CONFIG=/usr/share/ansible/summit/ansible.cfg
+
+[Install]
+WantedBy=default.target
+

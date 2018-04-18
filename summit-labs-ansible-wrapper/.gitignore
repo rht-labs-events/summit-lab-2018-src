@@ -1,0 +1,11 @@
+*.retry
+.vagrant
+*.zip
+openshift-ansible
+roles/docker
+roles/subscription
+roles/ssh
+roles/labs-app
+roles/applier
+roles/ci-cd
+roles/lab-src

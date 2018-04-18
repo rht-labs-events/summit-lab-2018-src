@@ -1,0 +1,9 @@
+---
+# tasks file for scenarion-debug-app
+
+- name: clean app user home dir
+  shell: "rm -rf ~/hello-openshift"
+
+- name: delete project hello-openshift
+  run_once: true
+  shell: "oc delete project hello-openshift"
