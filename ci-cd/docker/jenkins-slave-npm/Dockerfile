@@ -3,8 +3,8 @@ FROM openshift/jenkins-slave-nodejs-rhel7:latest
 USER root
 
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm google-chrome-stable_current_x86_64.rpm
-RUN yum -y install redhat-lsb libXScrnSaver xdg-utils wget
-RUN yum -y localinstall google-chrome-stable_current_x86_64.rpm
+RUN yum -y install redhat-lsb libXScrnSaver xdg-utils wget --disablerepo=rhel-7-server-htb-rpms
+RUN yum -y localinstall google-chrome-stable_current_x86_64.rpm --disablerepo=rhel-7-server-htb-rpms
 ENV CHROME_BIN /bin/google-chrome
 
 RUN yum remove -y rh-nodejs4; \
@@ -14,6 +14,7 @@ RUN yum remove -y rh-nodejs4; \
       --enablerepo=rhel-server-rhscl-7-rpms \
       --enablerepo=rhel-7-server-optional-rpms \
       --enablerepo=rhel-7-server-optional-rpms \
+      --disablerepo=rhel-7-server-htb-rpms \
       $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all -y && \
