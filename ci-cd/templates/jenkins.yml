@@ -37,6 +37,21 @@ objects:
       kind: Service
       name: ${JENKINS_SERVICE_NAME}
 - apiVersion: v1
+  kind: Route
+  metadata:
+    name: jenkins-lab
+  spec:
+    host: jenkins-ci-cd.apps.example.com
+    port:
+      targetPort: web
+    tls:
+      termination: edge
+    to:
+      kind: Service
+      name: jenkins
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     annotations:
