@@ -1,0 +1,51 @@
+scripts:
+  - name: "Scenario 1 - ETCD Failure"
+    description: "Observe ETCD state and recover when quorum is lost. Simulate 2 DC deployment."
+    executor: 
+      path: /home/mjudeiki/
+      script: ./start.sh
+      actionmapper:
+        solve: s1-solve
+        recover1: s1-start-etcd2
+        recover2: s1-start-etcd3
+        init: init
+        start: asdasd asd
+        break1: s1-stop-etcd2
+        break2: s1-stop-etcd3
+    actions: "[init, solve, break1, break2]"
+  - name: "scenario 1.2 - ETCD"
+    description: "Observe ETCD - Bonus task"
+    executor: 
+      path: "/usr/share/ansible/summit/"
+      script: make
+      actionmapper:
+        init: s1-start-time-drift
+        solve: s1-solve-time-drift
+    actions: "[init, solve]"
+  - name: "scenario 2 - Failed builds, application storage issues"
+    description: "Inspect failed build and solve why they are failed. "
+    executor: 
+      path: "/usr/share/ansible/summit/"
+      script: make
+      actionmapper:
+        init: s2-start
+        solve: s2-solve
+    actions: "[init, solve]"
+  - name: "scenario 3 - Scheduler issues"
+    description: "Inspect broken scheduler and solve pod distribution issue."
+    executor: 
+      path: "/usr/share/ansible/summit/"
+      script: make
+      actionmapper:
+        init: s3-start
+        solve: s3-solve
+    actions: "[init, solve]"
+  - name: "scenario 4 - Debugging application"
+    description: "Debug failed application using oc client"
+    executor: 
+      path: "/usr/share/ansible/summit/"
+      script: make
+      actionmapper:
+        init: s4-start
+        solve: s4-solve
+    actions: "[init, solve]"
