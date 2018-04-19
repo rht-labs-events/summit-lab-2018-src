@@ -37,4 +37,7 @@
 
 - name: generate build
   run_once: true
-  command: "oc new-project build-test; oc new-app centos/ruby-22-centos7~https://github.com/openshift/ruby-ex.git"
+  command: "{{ item }}"
+  with_items: 
+  - "oc new-project build-test"
+  - "oc new-app centos/ruby-22-centos7~https://github.com/openshift/ruby-ex.git"
