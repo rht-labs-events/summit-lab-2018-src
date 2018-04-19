@@ -1,0 +1,8 @@
+---
+# tasks file for ocp-pre-hooks
+
+- name: Install required packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ ocp_pre_packages }}"

@@ -1,0 +1,23 @@
+---
+# tasks file for skydive
+- name: Create project
+  shell: oc adm new-project --node-selector='' skydive
+
+- name: Copy sky-dive template
+  copy:
+    src: skydive-template.yaml
+    dest: /tmp/skydive-template.yaml
+
+- name: Create sky-dive template
+  shell: oc -n skydive create -f /tmp/skydive-template.yaml
+
+- name: Change DC permissions
+  shell: oc adm policy add-scc-to-user privileged system:serviceaccount:skydive:default
+
+- name: Deploy skydive
+  shell: oc -n skydive new-app --template=skydive
+
+- name: Remove sky-dive template file
+  file:
+    path: /tmp/skydive-template.yaml
+    state: absent 

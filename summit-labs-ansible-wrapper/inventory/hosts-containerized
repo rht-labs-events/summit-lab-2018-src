@@ -1,0 +1,180 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+new_nodes
+new_masters
+infra
+#lb
+glusterfs
+#glusterfs_registry
+bastion
+
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=root
+ansible_ssh_extra_args='-o StrictHostKeyChecking=no'
+ansible_become=yes
+deployment_type=openshift-enterprise
+containerized=true
+#openshift_version=3.9
+#docker_version=1.12.6
+
+#admin r3dh4t1!
+openshift_master_htpasswd_users={'admin': '$apr1$cwcjO82i$pUKIkWgc5Lo09tmLyuCx.0', 'user': '$apr1$cwcjO82i$pUKIkWgc5Lo09tmLyuCx.0'}
+openshift_master_identity_providers=[{'name': 'htpasswd', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+openshift_master_audit_config={"basicAuditEnabled": true}
+
+##Router
+openshift_hosted_router_selector='region=infra'
+openshift_hosted_router_replicas=3
+openshift_hosted_registry_storage_volume_size=10Gi
+
+##Registry
+openshift_hosted_registry_selector='region=infra'
+openshift_hosted_manage_registry=true
+openshift_hosted_registry_storage_kind=glusterfs
+
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=console.example.com
+openshift_master_cluster_public_hostname=console.example.com
+openshift_master_default_subdomain=apps.example.com
+
+openshift_node_kubelet_args={'pods-per-core': ['70'], 'max-pods': ['254'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80'],'kube-reserved': ['cpu=500m,memory=1.5G'], 'system-reserved': ['cpu=500m,memory=1.5G'] }
+
+
+#NTP config
+#Configure usage of openshiftansible_become=true_clock role.
+openshift_clock_enabled=true
+
+## Install the openshift examples
+openshift_install_examples=true
+
+#SDN Network
+openshift_docker_options="--selinux-enabled --log-driver=json"
+
+## Configure the multi-tenant SDN plugin (default is 'redhat/openshift-ovs-subnet')
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+
+## Configure master API and console ports.
+openshift_master_api_port=443
+openshift_master_console_port=443
+
+
+osm_default_node_selector='region=workers'
+openshift_schedulable_master=true
+
+openshift_hosted_registry_selector='region=infra'
+openshift_hosted_registry_storage_kind=glusterfs
+
+ansible_service_broker_install=false
+openshift_storage_glusterfs_registry_block_deploy=true
+openshift_storage_glusterfs_block_deploy=true
+openshift_storage_glusterfs_block_host_vol_size=15
+openshift_storage_glusterfs_block_storageclass=True
+openshift_storage_glusterfs_storageclass_default=True
+openshift_storage_glusterfs_block_storageclass_default=False
+
+#prometheus
+openshift_hosted_prometheus_deploy=true
+openshift_prometheus_storage_type=pvc
+openshift_prometheus_sc_name="glusterfs-storage"
+openshift_prometheus_alertmanager_storage_type=pvc
+openshift_prometheus_alertmanager_sc_name="glusterfs-storage"
+openshift_prometheus_alertbuffer_storage_type=pvc
+openshift_prometheus_alertbuffer_sc_name="glusterfs-storage"
+openshift_prometheus_storage_class=glusterfs-storage
+openshift_prometheus_pvc_access_mode=[ReadWriteOnce]
+openshift_prometheus_node_selector={"region":"infra"}
+openshift_prometheus_node_exporter_deploy=true
+openshift_prometheus_service_targetport=9090
+openshift_prometheus_alerts_service_targetport=9099
+openshift_prometheus_alertmanager_service_targetport=9093
+
+openshift_prometheus_hostname=prometheus.apps.example.com
+openshift_prometheus_alertmanager_hostname=alertmanager.apps.example.com
+openshift_prometheus_alerts_hostname=alerts.apps.example.com
+openshift_prometheus_memory_requests=2Gi
+openshift_prometheus_cpu_requests=750m
+openshift_prometheus_memory_limit=2Gi
+openshift_prometheus_cpu_limit=750m
+openshift_prometheus_alertmanager_memory_requests=300Mi
+openshift_prometheus_alertmanager_cpu_requests=200m
+openshift_prometheus_alertmanager_memory_limit=300Mi
+openshift_prometheus_alertmanager_cpu_limit=200m
+openshift_prometheus_alertbuffer_memory_requests=300Mi
+openshift_prometheus_alertbuffer_cpu_requests=200m
+openshift_prometheus_alertbuffer_memory_limit=300Mi
+openshift_prometheus_alertbuffer_cpu_limit=200m
+openshift_prometheus_additional_rules_file=/usr/share/ansible/summit/files/prometheus_alerts.rules
+
+
+openshift_prometheus_node_exporter_namespace=openshift-metrics-node-exporter
+
+#Grafana
+openshift_grafana_node_selector="{'region':'infra'}"
+openshift_grafana_node_exporter=true
+openshift_grafana_storage_type=pvc
+openshift_grafana_sc_name=glusterfs-storage
+openshift_grafana_service_targetport=3000
+openshift_grafana_hostname=grafana.apps.example.com
+#openshift_grafana_dashboards=["s1-etcd.json","s2-s3-Generic.json", "build-and-deployments.json", "cluster-resources.json", "go-metrics.json", "HAProxy.json", "infra-overview.json", "node-status.json", "pods-resources.json"]
+
+#### Custom variables
+docker_storage_disk=/dev/vdb
+docker_vg_name=docker_vg
+docker_var=false
+
+#iptables rules
+firewall_state=started
+firewall_enabled_at_boot=true
+firewall_allowed_tcp_ports=["9100","8443", "2379"]
+
+openshift_disable_check=memory_availability
+
+#we just pre-installed and later configured it manually for apps too
+#[lb]
+#bastion.example.com
+
+[masters]
+master1.example.com
+master2.example.com
+master3.example.com
+
+[etcd]
+master1.example.com
+master2.example.com
+master3.example.com
+
+[infra]
+infra1.example.com
+infra2.example.com
+infra3.example.com
+
+[glusterfs]                                         
+infra1.example.com glusterfs_ip="192.168.0.21" glusterfs_devices='["/dev/vdc"]'                                                            
+infra2.example.com glusterfs_ip="192.168.0.22" glusterfs_devices='["/dev/vdc"]'                                                                
+infra3.example.com glusterfs_ip="192.168.0.23" glusterfs_devices='["/dev/vdc"]'                                                               
+
+[nodes]
+node1.example.com openshift_node_labels="{'region':'workers','logging-infra-fluentd':'true','zone': 'az1', 'prometheus':'true'}"
+node2.example.com openshift_node_labels="{'region':'workers','logging-infra-fluentd':'true','zone': 'az2', 'prometheus':'true'}"
+node3.example.com openshift_node_labels="{'region':'workers','logging-infra-fluentd':'true','zone': 'az3', 'prometheus':'true'}"
+
+infra1.example.com openshift_node_labels="{'region':'infra','logging-infra-fluentd':'true','zone': 'az1', 'prometheus':'true'}"
+infra2.example.com openshift_node_labels="{'region':'infra','logging-infra-fluentd':'true','zone': 'az2', 'prometheus':'true'}"
+infra3.example.com openshift_node_labels="{'region':'infra','logging-infra-fluentd':'true','zone': 'az3', 'prometheus':'true'}"
+
+master1.example.com openshift_node_labels="{'region':'rsvd','logging-infra-fluentd':'true', 'zone': 'az1', 'prometheus':'true'}"
+master2.example.com openshift_node_labels="{'region':'rsvd','logging-infra-fluentd':'true', 'zone': 'az2', 'prometheus':'true'}"
+master3.example.com openshift_node_labels="{'region':'rsvd','logging-infra-fluentd':'true', 'zone': 'az3', 'prometheus':'true'}"
+
+[new_nodes]
+[new_masters]
+[bastion]
+bastion.example.com
+
+[seed-hosts]
+localhost ansible-connection=local

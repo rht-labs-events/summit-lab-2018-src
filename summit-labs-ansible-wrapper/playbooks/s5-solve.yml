@@ -1,0 +1,17 @@
+---
+- hosts: nodes
+  roles:
+   - lib_openshift
+   - lib_utils
+  post_tasks:
+   - name: Start OVS in node2 compute node.
+     service:
+       name: openvswitch
+       state: restarted
+     when: inventory_hostname == groups.nodes[1]
+
+   - name: Start atomic-openshift-node in node2 compute node.
+     service:
+       name: atomic-openshift-node
+       state: restarted
+     when: inventory_hostname == groups.nodes[1]

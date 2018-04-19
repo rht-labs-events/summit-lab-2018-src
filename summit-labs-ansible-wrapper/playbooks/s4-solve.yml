@@ -1,0 +1,11 @@
+---
+- hosts: bastion
+  roles:
+   - lib_utils
+   - lib_openshift
+  tasks:
+  #todo: move to import_role in 3.9
+  - name: Solve the scenario
+    include_role:
+      name: scenario-debug-app
+      tasks_from: solve

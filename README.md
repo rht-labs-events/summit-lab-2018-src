@@ -9,3 +9,5 @@
   - `lab-app:` contains the jenkins DSL definition to populate all the Jenkins jobs around ci-cd for the React app
   - `lab-react-app:` forked from `https://github.com/facebook/create-react-app`, a sample React FE app
   - `openshift-ansible:` custom openshift deployment playbooks with some modifications on the Prometheus and Grafana components
+  - `cli-wrapper:` custom `lab` golang wrapper to abstract command execution from user
+  - `summit-labs-ansible-wrapper:` contains all ansible playbooks for scenarios, config file for cli wrapper, any helper roles to configure environment. 

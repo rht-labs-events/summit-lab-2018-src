@@ -1,0 +1,11 @@
+---
+- hosts: nodes
+  roles:
+   - lib_openshift
+   - lib_utils
+  post_tasks:
+   - name: Start dnsmasq in node1 compute node.
+     service:
+       name: dnsmasq
+       state: restarted
+     when: inventory_hostname == groups.nodes[0]

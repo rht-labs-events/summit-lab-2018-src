@@ -1,0 +1,13 @@
+---
+- hosts: all:!bastion
+  roles:
+   - lib_utils
+   - lib_openshift
+   - labs-app/subscription
+   - labs-app/docker
+   - ocp-pre-hooks
+   - iptables-prom
+
+- hosts: masters
+  roles:
+   - ocp-pre-hooks-masters

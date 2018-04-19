@@ -1,0 +1,8 @@
+# Install a role from a specific gitlab
+- name: lab-src
+  src: https://github.com/rht-labs-events/summit-lab-2018-src.git
+  scm: git
+
+- name: applier
+  src: https://github.com/redhat-cop/openshift-applier
+  version: v3.7.2

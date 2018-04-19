@@ -1,0 +1,4 @@
+---
+# defaults file for ocp-adhoc-actions
+
+master_service_list: ['atomic-openshift-master-api', 'atomic-openshift-master-controllers']
