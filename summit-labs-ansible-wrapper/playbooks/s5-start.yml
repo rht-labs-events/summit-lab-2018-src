@@ -1,0 +1,17 @@
+---
+- hosts: masters[0]
+  roles:
+   - lib_openshift
+   - lib_utils
+   - openshift-skydive
+
+- hosts: nodes
+  roles:
+   - lib_openshift
+   - lib_utils
+  post_tasks:
+   - name: Stop OVS in node2 compute node.
+     service:
+       name: openvswitch
+       state: stopped
+     when: inventory_hostname == groups.nodes[1]

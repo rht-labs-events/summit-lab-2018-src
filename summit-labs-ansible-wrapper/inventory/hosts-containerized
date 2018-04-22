@@ -17,7 +17,7 @@ ansible_ssh_user=root
 ansible_ssh_extra_args='-o StrictHostKeyChecking=no'
 ansible_become=yes
 deployment_type=openshift-enterprise
-containerized=true
+#containerized=true
 #openshift_version=3.9
 #docker_version=1.12.6
 
@@ -121,6 +121,7 @@ openshift_grafana_sc_name=glusterfs-storage
 openshift_grafana_service_targetport=3000
 openshift_grafana_hostname=grafana.apps.example.com
 #openshift_grafana_dashboards=["s1-etcd.json","s2-s3-Generic.json", "build-and-deployments.json", "cluster-resources.json", "go-metrics.json", "HAProxy.json", "infra-overview.json", "node-status.json", "pods-resources.json"]
+openshift_web_console_nodeselector={'region':'infra'}
 
 #### Custom variables
 docker_storage_disk=/dev/vdb

@@ -15,3 +15,11 @@
        name: atomic-openshift-node
        state: restarted
      when: inventory_hostname == groups.nodes[1]
+
+- hosts: masters[0]
+  roles:
+   - lib_openshift
+   - lib_utils
+  post_tasks:
+   - name: Delete skydive project 
+     command: oc delete project skydive
