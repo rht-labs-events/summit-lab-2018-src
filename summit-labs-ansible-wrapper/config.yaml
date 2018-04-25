@@ -8,10 +8,9 @@ scripts:
         solve: s0-solve
         recover1: s0-start-etcd2
         recover2: s0-start-etcd3
-        init: "s0-stop-etcd2 s0-stop-etcd3"
         break1: s0-stop-etcd2
         break2: s0-stop-etcd3
-    actions: "[init, solve, break1, break2]"
+    actions: "[solve, break1, break2]"
   - name: "scenario 1 - ETCD"
     description: "Observe ETCD - Bonus task"
     executor: 

@@ -3,8 +3,8 @@
   roles:
    - lib_utils
    - lib_openshift
-   - labs-app/subscription
-   - labs-app/docker
+   - ansible-rh-subscription-manager
+   - ansible-docker
    - ocp-pre-hooks
    - iptables-prom
 

@@ -95,7 +95,7 @@ s4-solve:
 ### Scenario 5
 
 s5-start:
-	ansible-playbook --inventory-file=./inventory/ playbooks/s5-stop-ovs.yml
+	ansible-playbook --inventory-file=./inventory/ playbooks/s5-start.yml
 
 s5-solve:
 	ansible-playbook --inventory-file=./inventory/ playbooks/s5-solve.yml
