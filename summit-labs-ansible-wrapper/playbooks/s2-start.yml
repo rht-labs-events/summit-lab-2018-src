@@ -1,6 +1,0 @@
----
-- hosts: masters
-  roles:
-   - lib_openshift
-   - lib_utils
-   - scenario-registry-storage

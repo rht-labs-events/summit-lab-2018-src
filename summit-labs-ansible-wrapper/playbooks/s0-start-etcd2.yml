@@ -1,8 +1,0 @@
----
-- hosts: masters
-  vars:
-    start_etcd2: true
-  roles:
-   - lib_utils
-   - lib_openshift
-   - scenario-etcd 

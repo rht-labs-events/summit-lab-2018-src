@@ -1,0 +1,12 @@
+---
+- hosts: masters
+  roles:
+   - lib_utils
+   - lib_openshift
+  tasks:
+  #todo: move to import_role in 3.9
+  - name: Start the scenario
+    include_role:
+      name: scenario-scheduler
+      tasks_from: start
+      

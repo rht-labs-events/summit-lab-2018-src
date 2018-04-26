@@ -1,8 +1,6 @@
 ---
 - hosts: masters
-  vars:
-    start_time_drift: true
   roles:
-   - lib_utils
    - lib_openshift
-   - scenario-etcd 
+   - lib_utils
+   - scenario-registry-storage

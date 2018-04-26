@@ -1,18 +1,15 @@
 scripts:
-  - name: "Scenario 0 - ETCD Failure"
-    description: "Observe ETCD state and recover when quorum is lost. Simulate 2 DC deployment."
+  - name: "Scheduler issues"
+    description: "Inspect broken scheduler and solve pod distribution issue."
     executor: 
       path: "/usr/share/ansible/summit/"
       script: make
       actionmapper:
+        init: s0-start
         solve: s0-solve
-        recover1: s0-start-etcd2
-        recover2: s0-start-etcd3
-        break1: s0-stop-etcd2
-        break2: s0-stop-etcd3
-    actions: "[solve, break1, break2]"
-  - name: "scenario 1 - ETCD"
-    description: "Observe ETCD - Bonus task"
+    actions: "[init, solve]"
+  - name: "Failed builds, application storage issues"
+    description: "Inspect failed build and solve why they are failed. "
     executor: 
       path: "/usr/share/ansible/summit/"
       script: make
@@ -20,17 +17,20 @@ scripts:
         init: s1-start
         solve: s1-solve
     actions: "[init, solve]"
-  - name: "scenario 2 - Failed builds, application storage issues"
-    description: "Inspect failed build and solve why they are failed. "
+  - name: "ETCD Failure"
+    description: "Observe ETCD state and recover when quorum is lost. Simulate 2 DC deployment."
     executor: 
       path: "/usr/share/ansible/summit/"
       script: make
       actionmapper:
-        init: s2-start
         solve: s2-solve
-    actions: "[init, solve]"
-  - name: "scenario 3 - Scheduler issues"
-    description: "Inspect broken scheduler and solve pod distribution issue."
+        recover1: s2-start-etcd2
+        recover2: s2-start-etcd3
+        break1: s2-stop-etcd2
+        break2: s2-stop-etcd3
+    actions: "[solve, break1, break2]"
+  - name: "ETCD Performance"
+    description: "Observe ETCD - Bonus task"
     executor: 
       path: "/usr/share/ansible/summit/"
       script: make
@@ -38,7 +38,7 @@ scripts:
         init: s3-start
         solve: s3-solve
     actions: "[init, solve]"
-  - name: "scenario 4 - Debugging application"
+  - name: "Debugging application"
     description: "Debug failed application using oc client"
     executor: 
       path: "/usr/share/ansible/summit/"
@@ -47,7 +47,7 @@ scripts:
         init: s4-start
         solve: s4-solve
     actions: "[init, solve]"
-  - name: "scenario 5 - SDN failures "
+  - name: "SDN failures "
     description: "Observe and solve OVS/SDN network failures"
     executor: 
       path: "/usr/share/ansible/summit/"
@@ -56,7 +56,7 @@ scripts:
         init: s5-start
         solve: s5-solve
     actions: "[init, solve]"
-  - name: "scenario 6 - DNS failures "
+  - name: "DNS failures "
     description: "Observe and DNS config failures"
     executor: 
       path: "/usr/share/ansible/summit/"
