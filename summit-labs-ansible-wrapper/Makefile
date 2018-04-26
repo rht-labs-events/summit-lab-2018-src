@@ -43,19 +43,8 @@ ansible-sync-time:
 
 ### Scenario 0
 
-s0-start: s0-stop-etcd3 s0-stop-etcd2
-
-s0-stop-etcd3:
-	ansible-playbook --inventory-file=./inventory/ playbooks/s0-stop-etcd3.yml
-
-s0-stop-etcd2:
-	ansible-playbook --inventory-file=./inventory/ playbooks/s0-stop-etcd2.yml
-
-s0-start-etcd3:
-	ansible-playbook --inventory-file=./inventory/ playbooks/s0-start-etcd3.yml
-
-s0-start-etcd2:
-	ansible-playbook --inventory-file=./inventory/ playbooks/s0-start-etcd2.yml
+s0-start:
+	ansible-playbook --inventory-file=./inventory/ playbooks/s0-start.yml
 
 s0-solve:
 	ansible-playbook --inventory-file=./inventory/ playbooks/s0-solve.yml
@@ -70,8 +59,19 @@ s1-solve:
 
 ### Scenario 2
 
-s2-start:
-	ansible-playbook --inventory-file=./inventory/ playbooks/s2-start.yml
+s2-start: s2-stop-etcd3 s2-stop-etcd2
+
+s2-stop-etcd3:
+	ansible-playbook --inventory-file=./inventory/ playbooks/s2-stop-etcd3.yml
+
+s2-stop-etcd2:
+	ansible-playbook --inventory-file=./inventory/ playbooks/s2-stop-etcd2.yml
+
+s2-start-etcd3:
+	ansible-playbook --inventory-file=./inventory/ playbooks/s2-start-etcd3.yml
+
+s2-start-etcd2:
+	ansible-playbook --inventory-file=./inventory/ playbooks/s2-start-etcd2.yml
 
 s2-solve:
 	ansible-playbook --inventory-file=./inventory/ playbooks/s2-solve.yml
