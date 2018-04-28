@@ -68,7 +68,7 @@
       "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "gridPos": {
-        "h": 13,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 0
@@ -154,7 +154,7 @@
         "h": 7,
         "w": 7,
         "x": 0,
-        "y": 13
+        "y": 8
       },
       "id": 2,
       "legend": {
@@ -236,7 +236,7 @@
         "h": 7,
         "w": 8,
         "x": 7,
-        "y": 13
+        "y": 8
       },
       "id": 4,
       "legend": {
@@ -323,7 +323,7 @@
         "h": 7,
         "w": 9,
         "x": 15,
-        "y": 13
+        "y": 8
       },
       "id": 6,
       "legend": {
@@ -395,58 +395,86 @@
       ]
     },
     {
-      "columns": [],
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": "${DS_PROMETHEUS}",
-      "fontSize": "100%",
+      "fill": 1,
       "gridPos": {
-        "h": 9,
-        "w": 24,
+        "h": 6,
+        "w": 12,
         "x": 0,
-        "y": 20
+        "y": 15
       },
-      "id": 8,
+      "id": 32,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
       "links": [],
-      "pageSize": null,
-      "scroll": true,
-      "showHeader": true,
-      "sort": {
-        "col": 0,
-        "desc": true
-      },
-      "styles": [
-        {
-          "alias": "Time",
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "pattern": "Time",
-          "type": "date"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "decimals": 2,
-          "pattern": "/.*/",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        }
-      ],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
-          "expr": "kubelet_running_pod_count",
-          "format": "table",
-          "instant": true,
+          "expr": "scalar(avg(node_time{job=\"kubernetes-nodes-exporter\"})) - node_time{job=\"kubernetes-nodes-exporter\"} ",
+          "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "Node : {{ instance }}",
           "refId": "A"
         }
       ],
-      "title": "POD Count Table on each node",
-      "transform": "table",
-      "type": "table"
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Time Drift from average",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
     },
     {
       "cacheTimeout": null,
@@ -469,8 +497,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 6,
-        "y": 29
+        "x": 12,
+        "y": 15
       },
       "id": 22,
       "interval": null,
@@ -550,8 +578,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 8,
-        "y": 29
+        "x": 14,
+        "y": 15
       },
       "id": 24,
       "interval": null,
@@ -630,8 +658,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 10,
-        "y": 29
+        "x": 16,
+        "y": 15
       },
       "id": 26,
       "interval": null,
@@ -709,9 +737,9 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 3,
-        "x": 12,
-        "y": 29
+        "w": 2,
+        "x": 18,
+        "y": 15
       },
       "id": 28,
       "interval": null,
@@ -790,9 +818,9 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 9,
-        "x": 15,
-        "y": 29
+        "w": 4,
+        "x": 20,
+        "y": 15
       },
       "id": 30,
       "interval": null,
@@ -872,8 +900,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 6,
-        "y": 31
+        "x": 12,
+        "y": 17
       },
       "id": 16,
       "interval": null,
@@ -953,8 +981,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 8,
-        "y": 31
+        "x": 14,
+        "y": 17
       },
       "id": 18,
       "interval": null,
@@ -1034,8 +1062,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 10,
-        "y": 31
+        "x": 16,
+        "y": 17
       },
       "id": 20,
       "interval": null,
@@ -1115,8 +1143,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 6,
-        "y": 33
+        "x": 12,
+        "y": 19
       },
       "id": 10,
       "interval": null,
@@ -1196,8 +1224,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 8,
-        "y": 33
+        "x": 14,
+        "y": 19
       },
       "id": 12,
       "interval": null,
@@ -1277,8 +1305,8 @@
       "gridPos": {
         "h": 2,
         "w": 2,
-        "x": 10,
-        "y": 33
+        "x": 16,
+        "y": 19
       },
       "id": 14,
       "interval": null,
@@ -1338,86 +1366,58 @@
       "valueName": "avg"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
+      "columns": [],
       "datasource": "${DS_PROMETHEUS}",
-      "fill": 1,
+      "fontSize": "100%",
       "gridPos": {
-        "h": 5,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 21
       },
-      "id": 32,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
+      "id": 8,
       "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
       "targets": [
         {
-          "expr": "scalar(avg(node_time{job=\"kubernetes-nodes-exporter\"})) - node_time{job=\"kubernetes-nodes-exporter\"} ",
-          "format": "time_series",
+          "expr": "kubelet_running_pod_count",
+          "format": "table",
+          "instant": true,
           "intervalFactor": 1,
-          "legendFormat": "Node : {{ instance }}",
           "refId": "A"
         }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Time Drift from average",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ]
+      "title": "POD Count Table on each node",
+      "transform": "table",
+      "type": "table"
     }
   ],
   "schemaVersion": 16,
@@ -1458,5 +1458,5 @@
   "timezone": "",
   "title": "Labs Generic",
   "uid": "KdDBG7Wik",
-  "version": 9
+  "version": 1
 }
