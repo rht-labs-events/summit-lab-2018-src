@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.0.3"
+      "version": "5.0.4"
     },
     {
       "type": "panel",
@@ -387,6 +387,7 @@
       ]
     }
   ],
+  "refresh": "10s",
   "schemaVersion": 16,
   "style": "dark",
   "tags": [],
@@ -394,7 +395,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
@@ -425,5 +426,5 @@
   "timezone": "browser",
   "title": "Builds Oveview",
   "uid": "TNu3bPkmk",
-  "version": 3
+  "version": 1
 }

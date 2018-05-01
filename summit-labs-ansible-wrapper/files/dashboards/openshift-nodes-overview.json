@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.0.0-beta4"
+      "version": "5.0.4"
     },
     {
       "type": "panel",
@@ -59,7 +59,7 @@
   "gnetId": 405,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1521112092171,
+  "iteration": 1525189143069,
   "links": [],
   "panels": [
     {
@@ -68,7 +68,7 @@
       "error": false,
       "gridPos": {
         "h": 3,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -102,7 +102,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 3
       },
@@ -146,6 +146,7 @@
       "targets": [
         {
           "expr": "count(node_cpu{instance=~\"$node\", mode=\"system\"})",
+          "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -181,7 +182,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 6
       },
@@ -347,7 +348,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 13
       },
@@ -548,7 +549,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 20
       },
@@ -636,7 +637,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 27
       },
@@ -666,7 +667,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "100.0 - 100 * (node_filesystem_avail{instance=~'$node',device !~'tmpfs',device!~'by-uuid'} / node_filesystem_size{instance=~'$node',device !~'tmpfs',device!~'by-uuid'})",
+          "expr": "100.0 - 100 * (node_filesystem_free{instance=~'$node',device !~'tmpfs',device!~'by-uuid'} / node_filesystem_size{instance=~'$node',device !~'tmpfs',device!~'by-uuid'})",
+          "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "{{mountpoint}}",
@@ -723,7 +725,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 34
       },
@@ -754,6 +756,7 @@
       "targets": [
         {
           "expr": "irate(node_disk_io_time_ms{instance=~\"$node\"}[5m])/10",
+          "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "{{device}}",
@@ -810,7 +813,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 41
       },
@@ -846,6 +849,7 @@
       "targets": [
         {
           "expr": "irate(node_disk_reads_completed{instance=~'$node'}[5m])",
+          "format": "time_series",
           "interval": "",
           "intervalFactor": 4,
           "legendFormat": "{{device}}_read",
@@ -856,6 +860,7 @@
         },
         {
           "expr": "irate(node_disk_writes_completed{instance=~'$node'}[5m])",
+          "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{device}}_write",
           "metric": "",
@@ -911,7 +916,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 48
       },
@@ -1012,7 +1017,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 55
       },
@@ -1099,7 +1104,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 62
       },
@@ -1200,7 +1205,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 69
       },
@@ -1285,7 +1290,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 76
       },
@@ -1401,7 +1406,7 @@
       "grid": {},
       "gridPos": {
         "h": 7,
-        "w": 4.8,
+        "w": 24,
         "x": 0,
         "y": 83
       },
@@ -1475,6 +1480,7 @@
       ]
     }
   ],
+  "refresh": "10s",
   "schemaVersion": 16,
   "style": "dark",
   "tags": [
@@ -1541,5 +1547,5 @@
   "timezone": "browser",
   "title": "OpenShift Nodes Overview",
   "uid": "CgJ8L0ekz",
-  "version": 2
+  "version": 3
 }
