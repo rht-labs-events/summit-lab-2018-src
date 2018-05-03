@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.0.0-beta4"
+      "version": "5.0.4"
     },
     {
       "type": "panel",
@@ -47,7 +47,7 @@
   "gnetId": 240,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1521112049693,
+  "iteration": 1525189038863,
   "links": [],
   "panels": [
     {
@@ -824,7 +824,7 @@
       ]
     }
   ],
-  "refresh": "30s",
+  "refresh": "10s",
   "schemaVersion": 16,
   "style": "dark",
   "tags": [
@@ -900,7 +900,7 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
@@ -931,5 +931,5 @@
   "timezone": "browser",
   "title": "Go Processes",
   "uid": "6-TdEA6kz",
-  "version": 2
+  "version": 1
 }
